@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oyun Çevirmenim Pro</title>
+    <!-- Tailwind CSS (Görsellik için) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- İkonlar için -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Python ile iletişim kurmak için gereken EEL kütüphanesi -->
+    <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center h-screen font-sans">
+    
+    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-lg border border-gray-700">
+        <!-- Başlık Kısmı -->
+        <div class="text-center mb-8">
+            <i class="fas fa-language text-5xl text-blue-500 mb-4"></i>
+            <h1 class="text-3xl font-bold text-gray-100">Oyun Çevirmeni</h1>
+            <p class="text-gray-400 mt-2">Oyun klasörünü seçin ve arkanıza yaslanın.</p>
+        </div>
+
+        <!-- Çeviri Butonu -->
+        <div class="space-y-4">
+            <button onclick="startProcess()" id="translateBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-4 rounded-lg transition duration-200 flex items-center justify-center text-lg shadow-lg">
+                <i class="fas fa-folder-open mr-2"></i> Oyun Klasörünü Seç ve Çevir
+            </button>
+        </div>
+
+        <!-- Log (Kayıt) Ekranı -->
+        <div class="mt-6">
+            <p class="text-sm text-gray-400 mb-2 font-semibold">İşlem Kayıtları:</p>
+            <div id="logArea" class="bg-black p-4 rounded-lg text-sm text-green-400 font-mono h-48 overflow-y-auto border border-gray-700 shadow-inner">
+                Sistem hazır. Çevirmek istediğiniz oyunun klasörünü seçmek için yukarıdaki butona tıklayın...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Python'dan gelen anlık mesajları ekrana yazdırmak için
+        eel.expose(update_log);
+        function update_log(message) {
+            let logArea = document.getElementById("logArea");
+            // Mesajı alt alta ekle
+            logArea.innerHTML += "<br>> <span class='text-gray-300'>" + message + "</span>";
+            // Scroll'u her zaman en alta kaydır
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        // Butona basıldığında çalışacak fonksiyon
+        async function startProcess() {
+            let btn = document.getElementById("translateBtn");
+            let logArea = document.getElementById("logArea");
+            
+            // Butonu bekleme moduna al
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> İşlem Yapılıyor, Lütfen Bekleyin...';
+            btn.classList.replace('bg-blue-600', 'bg-gray-600');
+            btn.classList.replace('hover:bg-blue-500', 'hover:bg-gray-600');
+            
+            logArea.innerHTML += "<br><br>=============================<br>";
+            
+            // Python tarafındaki start_translation fonksiyonunu tetikle
+            await eel.start_translation()();
+
+            // İşlem bitince butonu eski haline getir
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-folder-open mr-2"></i> Yeni Klasör Seç ve Çevir';
+            btn.classList.replace('bg-gray-600', 'bg-blue-600');
+            btn.classList.replace('hover:bg-gray-600', 'hover:bg-blue-500');
+        }
+    </script>
+</body>
+</html>
